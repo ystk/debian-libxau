@@ -26,6 +26,7 @@ endif
 DEB_HOST_ARCH      ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
 	confflags += --build=$(DEB_HOST_GNU_TYPE)
 else
@@ -42,10 +43,15 @@ build/config.status: configure
 	  --prefix=/usr \
 	  --mandir=\$${prefix}/share/man \
 	  --infodir=\$${prefix}/share/info \
+	  --libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH) \
 	  $(confflags) \
 	  CFLAGS="$(CFLAGS)"
 
-build: build-stamp
+build: build-indep build-arch
+build-indep:
+build-arch: build-stamp
+.PHONY: build build-indep build-arch
+
 build-stamp: build/config.status
 	dh_testdir
 
@@ -55,9 +61,7 @@ build-stamp: build/config.status
 
 clean: xsfclean
 	dh_testdir
-	dh_testroot
 	rm -f build-stamp
-
 	rm -f config.cache config.log config.status
 	rm -f */config.cache */config.log */config.status
 	rm -f conftest* */conftest*
@@ -66,7 +70,6 @@ clean: xsfclean
 	rm -f $$(find -name Makefile.in)
 	rm -f compile config.guess config.sub configure depcomp install-sh
 	rm -f ltmain.sh missing INSTALL aclocal.m4 mkinstalldirs config.h.in
-
 	dh_clean
 
 install: build
@@ -86,7 +89,8 @@ binary-arch: build install
 	dh_install --sourcedir=debian/tmp --list-missing
 	dh_installchangelogs ChangeLog
 	dh_link
-	dh_strip --dbg-package=$(PACKAGE)-dbg
+	dh_strip -p$(PACKAGE) --dbg-package=$(PACKAGE)-dbg
+	dh_strip -N$(PACKAGE)
 	dh_compress
 	dh_fixperms
 	dh_makeshlibs --add-udeb=$(PACKAGE)-udeb
@@ -101,4 +105,4 @@ binary-indep: build install
 # Nothing to do
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: clean binary-indep binary-arch binary install

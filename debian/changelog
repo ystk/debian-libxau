@@ -1,3 +1,39 @@
+libxau (1:1.0.7-1) unstable; urgency=low
+
+  * New upstream release.
+  * Don't require (fake)root for debian/rules clean.
+  * Bump xutils-dev build-dep to 1:7.5+4 for newer macros.
+
+ -- Julien Cristau <jcristau@debian.org>  Mon, 09 Apr 2012 18:50:40 +0200
+
+libxau (1:1.0.6-4) unstable; urgency=low
+
+  * Mark libxau-dev Multi-Arch: same, after confirming the contents are
+    compatible between amd64 and armel.
+
+ -- Steve Langasek <vorlon@debian.org>  Tue, 08 Nov 2011 19:31:51 -0800
+
+libxau (1:1.0.6-3) unstable; urgency=low
+
+  * Team upload.
+  * Don't put debugging symbols for the udeb in libxau6-dbg.
+  * Add build-arch and (empty) build-indep debian/rules targets.
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 11 Jun 2011 23:47:19 +0200
+
+libxau (1:1.0.6-2) unstable; urgency=low
+
+  * Team upload.
+
+  [ Steve Langasek ]
+  * Build for multiarch.
+
+  [ Julien Cristau ]
+  * Remove David Nusinow from Uploaders.
+  * Bump Standards-Version to 3.9.2.
+
+ -- Julien Cristau <jcristau@debian.org>  Wed, 08 Jun 2011 19:59:21 +0200
+
 libxau (1:1.0.6-1) unstable; urgency=low
 
   * New upstream release
