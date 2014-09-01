@@ -12,12 +12,6 @@ PACKAGE = libxau6
 
 include debian/xsfbs/xsfbs.mk
 
-CFLAGS = -Wall -g
-ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
-else
-	CFLAGS += -O2
-endif
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	MAKEFLAGS += -j$(NUMJOBS)
@@ -44,8 +38,9 @@ build/config.status: configure
 	  --mandir=\$${prefix}/share/man \
 	  --infodir=\$${prefix}/share/info \
 	  --libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH) \
+	  --disable-silent-rules \
 	  $(confflags) \
-	  CFLAGS="$(CFLAGS)"
+	  $(shell DEB_CFLAGS_MAINT_APPEND=-Wall dpkg-buildflags --export=configure)
 
 build: build-indep build-arch
 build-indep:
@@ -67,7 +62,7 @@ clean: xsfclean
 	rm -f conftest* */conftest*
 	rm -rf autom4te.cache */autom4te.cache
 	rm -rf build
-	rm -f $$(find -name Makefile.in)
+	find -name Makefile.in -delete
 	rm -f compile config.guess config.sub configure depcomp install-sh
 	rm -f ltmain.sh missing INSTALL aclocal.m4 mkinstalldirs config.h.in
 	dh_clean
@@ -86,8 +81,8 @@ binary-arch: build install
 	dh_testroot
 
 	dh_installdocs
-	dh_install --sourcedir=debian/tmp --list-missing
-	dh_installchangelogs ChangeLog
+	dh_install --list-missing
+	dh_installchangelogs
 	dh_link
 	dh_strip -p$(PACKAGE) --dbg-package=$(PACKAGE)-dbg
 	dh_strip -N$(PACKAGE)
